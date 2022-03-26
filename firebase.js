@@ -1,4 +1,6 @@
-import firebase from "firebase";
+import firebase from "firebase/compat/app";
+import "firebase/compat/auth"
+import "firebase/compat/firestore"
 const firebaseConfig = {
   apiKey: "AIzaSyCDWnur4dhVEktVdBF_KRGho_RzS-Fd6YE",
   authDomain: "whatsapp-2-b2245.firebaseapp.com",
