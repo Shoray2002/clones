@@ -1,5 +1,8 @@
+import { auth, db } from "../firebase";
+import { useAuthState } from "react-firebase-hooks/auth";
 import styled from "styled-components";
 import { Avatar, Button, IconButton } from "@material-ui/core";
+import { useCollection } from "react-firebase-hooks/firestore";
 import ChatIcon from "@mui/icons-material/Chat";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import SearchIcon from "@mui/icons-material/Search";
@@ -10,24 +13,43 @@ function validateEmail(email) {
 }
 
 function Sidebar() {
+  const [user] = useAuthState(auth);
+  const userChatRef = db
+    .collection("chats")
+    .where("users", "array-contains", user.email);
+  const [chatsSnapshot] = useCollection(userChatRef);
   const createChat = () => {
     const input = prompt("Enter the email for chat");
     if (!input) {
       alert("Cancelled");
       return;
     }
-    // validate email
-    if (!validateEmail(input)) {
+    if (
+      validateEmail(input) &&
+      !chatAlreadyExists(input) &&
+      input !== user.email
+    ) {
+      db.collection("chat").add({
+        users: [user.email, input],
+      });
+    } else {
       alert("Invalid email");
       return;
-    } else {
-      alert("Chat created");
     }
   };
+  const logout = () => {
+    auth.signOut();
+  };
+  const chatAlreadyExists = (receipientEmail) =>
+    !!chatsSnapshot?.docs.find(
+      (chat) =>
+        chat.data().users.find((user) => user === receipientEmail)?.length > 0
+    );
+
   return (
     <Container>
       <Header>
-        <UserAvatar />
+        <UserAvatar onClick={logout} />
         <IconsContainer>
           <IconButton>
             <ChatIcon />
