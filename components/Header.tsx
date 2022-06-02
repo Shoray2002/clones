@@ -15,8 +15,9 @@ import {
   SpeakerphoneIcon,
   VideoCameraIcon,
 } from '@heroicons/react/outline'
-
+import { signIn, signOut, useSession } from 'next-auth/react'
 function Header() {
+  const { data: session } = useSession()
   return (
     <div className="flex bg-slate-50 px-4 py-2 shadow-sm sticky top-0 z-50">
       <div className="relative h-10 w-20 flex-shrink-0">
@@ -60,16 +61,39 @@ function Header() {
         <MenuIcon className="icon" />
       </div>
       {/* sign in/out */}
-      <div className="hidden lg:flex items-center space-x-2 border border-gray-100 p-2 cursor-pointer flex-shrink-0">
-        <div className="relative h-5 w-5   ">
-          <Image
-            src="https://logoeps.com/wp-content/uploads/2014/09/52053-reddit-logo-icon-vector-icon-vector-eps.png"
-            layout="fill"
-            objectFit="contain"
-          />
+      {session ? (
+        <div
+          className="hidden lg:flex items-center space-x-2 border border-gray-100 p-2 cursor-pointer flex-shrink-0"
+          onClick={() => signOut()}
+        >
+          <div className="relative h-5 w-5   ">
+            <Image
+              src="https://logoeps.com/wp-content/uploads/2014/09/52053-reddit-logo-icon-vector-icon-vector-eps.png"
+              layout="fill"
+              objectFit="contain"
+            />
+          </div>
+          <div className="flex-1 text-sm">
+            <p className="truncate">{session.user?.name}</p>
+            <p className="text-gray-500">1 Karma</p>
+          </div>
+          <ChevronDownIcon className="h-5 flex-shrink-0 text-gray-400" />
         </div>
-        <p className="text-gray-500">Sign-In</p>
-      </div>
+      ) : (
+        <div
+          className="hidden lg:flex items-center space-x-2 border border-gray-100 p-2 cursor-pointer flex-shrink-0"
+          onClick={() => signIn()}
+        >
+          <div className="relative h-5 w-5   ">
+            <Image
+              src="https://logoeps.com/wp-content/uploads/2014/09/52053-reddit-logo-icon-vector-icon-vector-eps.png"
+              layout="fill"
+              objectFit="contain"
+            />
+          </div>
+          <p className="text-gray-500">Sign-In</p>
+        </div>
+      )}
     </div>
   )
 }
